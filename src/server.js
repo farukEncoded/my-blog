@@ -1,13 +1,19 @@
 import express from "express";
 import { MongoClient } from "mongodb";
 import cors from "cors";
+import path from "path";
+
+const PORT = process.env.PORT || 8000;
 
 const withDB = async (operations, res) => {
   try {
-    const client = await MongoClient.connect("mongodb://localhost:27017", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const client = await MongoClient.connect(
+      "mongodb+srv://faruk:faruk123@cluster0.ushtf.mongodb.net/my-blog?retryWrites=true&w=majority",
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }
+    );
     const db = client.db("my-blog");
     await operations(db);
     client.close();
@@ -17,6 +23,8 @@ const withDB = async (operations, res) => {
 };
 
 const app = express();
+
+app.use(express.static(path.join(__dirname, "/build")));
 
 app.use(cors());
 
@@ -76,4 +84,8 @@ app.post("/api/articles/:name/add-comment", (req, res) => {
   }, res);
 });
 
-app.listen(8000, console.log("Server started at PORT: 8000"));
+app.get("*", (req, res) =>
+  res.sendFile(path.join(__dirname, "/build/index.html"))
+);
+
+app.listen(PORT, console.log(`Server started at PORT: ${PORT}`));
