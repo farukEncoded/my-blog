@@ -1,19 +1,18 @@
+import dotenv from "dotenv";
 import express from "express";
 import { MongoClient } from "mongodb";
 import cors from "cors";
 import path from "path";
 
+dotenv.config();
 const PORT = process.env.PORT || 8000;
 
 const withDB = async (operations, res) => {
   try {
-    const client = await MongoClient.connect(
-      "mongodb+srv://faruk:faruk123@cluster0.ushtf.mongodb.net/my-blog?retryWrites=true&w=majority",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    );
+    const client = await MongoClient.connect(process.env.DB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     const db = client.db("my-blog");
     await operations(db);
     client.close();
